@@ -28,3 +28,23 @@ def creer_restaurant_address(data: RestaurantAddressCreate, db: Session = Depend
     db.commit()
     db.refresh(restoaddress)
     return restoaddress
+
+@router.delete("/{id_address}", status_code=204)
+def supprimer_restaurant_address(id_address: int, db: Session = Depends(get_db)):
+    restoaddress = db.get(Restaurant_address, id_address)
+    if restoaddress is None:
+        raise HTTPException(status_code=404, detail="Adresse du restaurant introuvable")
+    db.delete(restoaddress)
+    db.commit()
+
+@router.put("/{id_address}", response_model=RestaurantAddressRead)
+def update_restaurant_address(id_address: int, data: RestaurantAddressCreate, db: Session = Depends(get_db)):
+    restoaddress = db.get(Restaurant_address, id_address)
+    if restoaddress is None:
+        raise HTTPException(status_code=404, detail="Adresse du restaurant introuvable")
+     # Parcourir la boucle pour appliquer le ou les changements sur les champ
+    for champ, valeur in data.model_dump().items():
+        setattr(restoaddress, champ, valeur)
+    db.commit()
+    db.refresh(restoaddress)
+    return restoaddress

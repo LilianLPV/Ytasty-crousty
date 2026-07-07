@@ -27,3 +27,23 @@ def creer_product(data: ProductCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(prod)
     return prod
+
+@router.delete("/{id_product}", status_code=204)
+def supprimer_product(id_product: int, db: Session = Depends(get_db)):
+    prod = db.get(Product, id_product)
+    if prod is None:
+        raise HTTPException(status_code=404, detail="Produit introuvable")
+    db.delete(prod)
+    db.commit()
+
+@router.put("/{id_product}", response_model=ProductRead)
+def update_product(id_product: int, data: ProductCreate, db: Session = Depends(get_db)):
+    prod = db.get(Product, id_product)
+    if prod is None:
+        raise HTTPException(status_code=404, detail="Produit introuvable")
+     # Parcourir la boucle pour appliquer le ou les changements sur les champ
+    for champ, valeur in data.model_dump().items():
+        setattr(prod, champ, valeur)
+    db.commit()
+    db.refresh(prod)
+    return prod

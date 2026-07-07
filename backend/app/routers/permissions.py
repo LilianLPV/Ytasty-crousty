@@ -27,3 +27,23 @@ def creer_permission(data: PermissionsCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(perm)
     return perm
+
+@router.delete("/{id_permission}", status_code=204)
+def supprimer_permission(id_permission: int, db: Session = Depends(get_db)):
+    perm = db.get(Permission, id_permission)
+    if perm is None:
+        raise HTTPException(status_code=404, detail="Permission introuvable")
+    db.delete(perm)
+    db.commit()
+
+@router.put("/{id_permission}", response_model=PermissionsRead)
+def update_permission(id_permission: int, data: PermissionsCreate, db: Session = Depends(get_db)):
+    perm = db.get(Permission, id_permission)
+    if perm is None:
+        raise HTTPException(status_code=404, detail="Permission introuvable")
+     # Parcourir la boucle pour appliquer le ou les changements sur les champ
+    for champ, valeur in data.model_dump().items():
+        setattr(perm, champ, valeur)
+    db.commit()
+    db.refresh(perm)
+    return perm
