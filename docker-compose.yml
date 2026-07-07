@@ -8,7 +8,9 @@ services:
       - POSTGRES_DB=ytasty_db
     ports:
       - '5432:5432'
+        # La ou on va stocker notre bdd
     volumes:
       - postgres_data:/var/lib/postgresql/data
 volumes:
+# Docker créer et gérer cette espace de stockage
   postgres_data:
