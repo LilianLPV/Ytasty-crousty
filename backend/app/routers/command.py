@@ -27,3 +27,23 @@ def creer_command(data: CommandCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(comd)
     return comd
+
+@router.delete("/{id_command}", status_code=204)
+def supprimer_command(id_command: int, db: Session = Depends(get_db)):
+    comd = db.get(Command, id_command)
+    if comd is None:
+        raise HTTPException(status_code=404, detail="Commande introuvable")
+    db.delete(comd)
+    db.commit()
+
+@router.put("/{id_command}", response_model=CommandRead)
+def update_command(id_command: int, data: CommandCreate, db: Session = Depends(get_db)):
+    comd = db.get(Command, id_command)
+    if comd is None:
+        raise HTTPException(status_code=404, detail="Commande introuvable")
+     # Parcourir la boucle pour appliquer le ou les changements sur les champ
+    for champ, valeur in data.model_dump().items():
+        setattr(comd, champ, valeur)
+    db.commit()
+    db.refresh(comd)
+    return comd

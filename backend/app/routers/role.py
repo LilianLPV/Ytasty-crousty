@@ -27,3 +27,24 @@ def creer_role(data: RoleCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(rol)
     return rol
+
+@router.delete("/{id_role}", status_code=204)
+def supprimer_role(id_role: int, db: Session = Depends(get_db)):
+    rol = db.get(Role, id_role)
+    if rol is None:
+        raise HTTPException(status_code=404, detail="Rôle introuvable")
+    db.delete(rol)
+    db.commit()
+
+@router.put("/{id_role}", response_model=RoleRead)
+def update_role(id_role: int, data: RoleCreate, db: Session = Depends(get_db)):
+    rol = db.get(Role, id_role)
+    if rol is None:
+        raise HTTPException(status_code=404, detail="Rôle introuvable")
+     # Parcourir la boucle pour appliquer le ou les changements sur les champ
+    for champ, valeur in data.model_dump().items():
+        setattr(rol, champ, valeur)
+    db.commit()
+    db.refresh(rol)
+    return rol
+
