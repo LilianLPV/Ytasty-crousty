@@ -1,0 +1,29 @@
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.models.role import Role
+from app.schemas.role import RoleRead
+from app.schemas.role import RoleCreate 
+from app.database import get_db
+
+router = APIRouter(prefix="/roles", tags=["roles"])
+
+@router.get("/", response_model=list[RoleRead])
+def liste_role(db : Session = Depends(get_db)):
+    return db.scalars(select(Role)).all()
+
+@router.get("/{id_role}", response_model=RoleRead)
+def role(id_role: int, db: Session = Depends(get_db)):
+    rol = db.get(Role, id_role)
+    if rol is None:
+        raise HTTPException(status_code=404, detail="Rôle introuvable")
+    return rol
+
+@router.post("/", response_model=RoleRead, status_code=201)
+def creer_role(data: RoleCreate, db: Session = Depends(get_db)):
+    rol = Role(**data.model_dump())
+    db.add(rol)
+    db.commit()
+    db.refresh(rol)
+    return rol
