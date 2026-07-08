@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.schemas.user import UserRead
 from app.schemas.user import UserCreate
+from app.utils.jwt import hash_password
 from app.database import get_db
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -22,7 +23,9 @@ def user(id_user: int, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=UserRead, status_code=201)
 def creer_user(data: UserCreate, db: Session = Depends(get_db)):
-    usr = User(**data.model_dump())
+    user_data = data.model_dump()
+    user_data["password"] = hash_password(data.password)
+    usr = User(**user_data)
     db.add(usr)
     db.commit()
     db.refresh(usr)
