@@ -9,6 +9,7 @@ class UserRead(BaseModel):
     first_name: str
     username: str
 
+#POST
 class UserCreate(BaseModel):
     
     name: str

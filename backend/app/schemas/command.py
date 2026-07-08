@@ -13,6 +13,7 @@ class CommandRead(BaseModel):
     customer_information: str
     price_total: float
 
+#POST
 class CommandCreate(BaseModel):
     
     number_command: str

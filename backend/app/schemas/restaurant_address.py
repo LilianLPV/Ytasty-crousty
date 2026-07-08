@@ -8,7 +8,7 @@ class RestaurantAddressRead(BaseModel):
     city: str
     address: str
 
-
+#POST
 class RestaurantAddressCreate(BaseModel):
     city: str
     address: str

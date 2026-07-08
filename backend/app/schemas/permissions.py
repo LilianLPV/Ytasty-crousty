@@ -6,7 +6,8 @@ class PermissionsRead(BaseModel):
 
     id_permission: int
     tag_permission: str
-        
+
+#POST    
 class PermissionsCreate(BaseModel):
     
     tag_permission: str
