@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from app.models.product import Product
 from app.schemas.product import ProductRead
 from app.schemas.product import ProductCreate
+from app.utils.jwt import get_current_user
+from app.models.user import User
 from app.database import get_db
 
 router = APIRouter(prefix="/products", tags=["products"])
@@ -21,7 +23,7 @@ def product(id_product: int, db: Session = Depends(get_db)):
     return prod
 
 @router.post("/", response_model=ProductRead, status_code=201)
-def creer_product(data: ProductCreate, db: Session = Depends(get_db)):
+def creer_product(data: ProductCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     prod = Product(**data.model_dump())
     db.add(prod)
     db.commit()
@@ -29,7 +31,7 @@ def creer_product(data: ProductCreate, db: Session = Depends(get_db)):
     return prod
 
 @router.delete("/{id_product}", status_code=204)
-def supprimer_product(id_product: int, db: Session = Depends(get_db)):
+def supprimer_product(id_product: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     prod = db.get(Product, id_product)
     if prod is None:
         raise HTTPException(status_code=404, detail="Produit introuvable")
@@ -37,7 +39,7 @@ def supprimer_product(id_product: int, db: Session = Depends(get_db)):
     db.commit()
 
 @router.put("/{id_product}", response_model=ProductRead)
-def update_product(id_product: int, data: ProductCreate, db: Session = Depends(get_db)):
+def update_product(id_product: int, data: ProductCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     prod = db.get(Product, id_product)
     if prod is None:
         raise HTTPException(status_code=404, detail="Produit introuvable")

@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from app.models.restaurant_address import Restaurant_address
 from app.schemas.restaurant_address import RestaurantAddressRead
 from app.schemas.restaurant_address import RestaurantAddressCreate
+from app.utils.jwt import get_current_user
+from app.models.user import User
 
 from app.database import get_db
 
@@ -22,7 +24,7 @@ def restaurant_address(id_address: int, db: Session = Depends(get_db)):
     return restoaddress
 
 @router.post("/", response_model=RestaurantAddressRead, status_code=201)
-def creer_restaurant_address(data: RestaurantAddressCreate, db: Session = Depends(get_db)):
+def creer_restaurant_address(data: RestaurantAddressCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     restoaddress = Restaurant_address(**data.model_dump())
     db.add(restoaddress)
     db.commit()
@@ -30,7 +32,7 @@ def creer_restaurant_address(data: RestaurantAddressCreate, db: Session = Depend
     return restoaddress
 
 @router.delete("/{id_address}", status_code=204)
-def supprimer_restaurant_address(id_address: int, db: Session = Depends(get_db)):
+def supprimer_restaurant_address(id_address: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     restoaddress = db.get(Restaurant_address, id_address)
     if restoaddress is None:
         raise HTTPException(status_code=404, detail="Adresse du restaurant introuvable")
@@ -38,7 +40,7 @@ def supprimer_restaurant_address(id_address: int, db: Session = Depends(get_db))
     db.commit()
 
 @router.put("/{id_address}", response_model=RestaurantAddressRead)
-def update_restaurant_address(id_address: int, data: RestaurantAddressCreate, db: Session = Depends(get_db)):
+def update_restaurant_address(id_address: int, data: RestaurantAddressCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     restoaddress = db.get(Restaurant_address, id_address)
     if restoaddress is None:
         raise HTTPException(status_code=404, detail="Adresse du restaurant introuvable")

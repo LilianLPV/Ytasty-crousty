@@ -6,23 +6,25 @@ from app.models.user import User
 from app.schemas.user import UserRead
 from app.schemas.user import UserCreate
 from app.utils.jwt import hash_password
+from app.utils.jwt import get_current_user
+from app.models.user import User
 from app.database import get_db
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/", response_model=list[UserRead])
-def liste_user(db : Session = Depends(get_db)):
+def liste_user(db : Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return db.scalars(select(User)).all()
 
 @router.get("/{id_user}", response_model=UserRead)
-def user(id_user: int, db: Session = Depends(get_db)):
+def user(id_user: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     usr = db.get(User, id_user)
     if usr is None:
         raise HTTPException(status_code=404, detail="Utilisateur introuvable")
     return usr
 
 @router.post("/", response_model=UserRead, status_code=201)
-def creer_user(data: UserCreate, db: Session = Depends(get_db)):
+def creer_user(data: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     user_data = data.model_dump()
     user_data["password"] = hash_password(data.password)
     usr = User(**user_data)
@@ -32,7 +34,7 @@ def creer_user(data: UserCreate, db: Session = Depends(get_db)):
     return usr
 
 @router.delete("/{id_user}", status_code=204)
-def supprimer_user(id_user: int, db: Session = Depends(get_db)):
+def supprimer_user(id_user: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     usr = db.get(User, id_user)
     if usr is None:
         raise HTTPException(status_code=404, detail="Utilisateur introuvable")
@@ -40,7 +42,7 @@ def supprimer_user(id_user: int, db: Session = Depends(get_db)):
     db.commit()
 
 @router.put("/{id_user}", response_model=UserRead)
-def update_user(id_user: int, data: UserCreate, db: Session = Depends(get_db)):
+def update_user(id_user: int, data: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     usr = db.get(User, id_user)
     if usr is None:
         raise HTTPException(status_code=404, detail="Utilisateur introuvable")

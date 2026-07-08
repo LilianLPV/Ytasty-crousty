@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 from app.models.restaurant import Restaurant
 from app.schemas.restaurant import RestaurantRead
 from app.schemas.restaurant import RestaurantCreate
-
+from app.utils.jwt import get_current_user
+from app.models.user import User
 from app.database import get_db
 
 router = APIRouter(prefix="/restaurants", tags=["restaurants"])
@@ -22,7 +23,7 @@ def restaurant(id_restaurant: int, db: Session = Depends(get_db)):
     return resto
 
 @router.post("/", response_model=RestaurantRead, status_code=201)
-def creer_restaurant(data: RestaurantCreate, db: Session = Depends(get_db)):
+def creer_restaurant(data: RestaurantCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     resto = Restaurant(**data.model_dump())
     db.add(resto)
     db.commit()
@@ -30,7 +31,7 @@ def creer_restaurant(data: RestaurantCreate, db: Session = Depends(get_db)):
     return resto
 
 @router.delete("/{id_restaurant}", status_code=204)
-def supprimer_restaurant(id_restaurant: int, db: Session = Depends(get_db)):
+def supprimer_restaurant(id_restaurant: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     resto = db.get(Restaurant, id_restaurant)
     if resto is None:
         raise HTTPException(status_code=404, detail="Restaurant introuvable")
@@ -38,7 +39,7 @@ def supprimer_restaurant(id_restaurant: int, db: Session = Depends(get_db)):
     db.commit()
 
 @router.put("/{id_restaurant}", response_model=RestaurantRead)
-def update_restaurant(id_restaurant: int, data: RestaurantCreate, db: Session = Depends(get_db)):
+def update_restaurant(id_restaurant: int, data: RestaurantCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     resto = db.get(Restaurant, id_restaurant)
     if resto is None:
         raise HTTPException(status_code=404, detail="Restaurant introuvable")
