@@ -6,7 +6,8 @@ class RoleRead(BaseModel):
 
     id_role: int
     role_name: str
-    
+
+#POST    
 class RoleCreate(BaseModel):
     
     role_name: str

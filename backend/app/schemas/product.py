@@ -11,7 +11,8 @@ class ProductRead(BaseModel):
     availability: bool
     category: str
     ingredient_list: str
-    
+
+#POST 
 class ProductCreate(BaseModel):
     
     name: str

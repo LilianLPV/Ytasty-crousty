@@ -9,27 +9,35 @@ from app.utils.jwt import get_current_user
 from app.models.user import User
 from app.database import get_db
 
+# On définit le rtouer avec un tag ou le /docs
 router = APIRouter(prefix="/commands", tags=["commands"])
 
+# On READ (liste) accessible à tout le monde
 @router.get("/", response_model=list[CommandRead])
 def liste_command(db : Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # On récupère tous les restaurants en base
     return db.scalars(select(Command)).all()
 
+# READ (Détail) : Accessible à tout le monde
 @router.get("/{id_command}", response_model=CommandRead)
 def command(id_command: int, db: Session = Depends(get_db)):
+    # Cherche un resto par son ID
     comd = db.get(Command, id_command)
     if comd is None:
         raise HTTPException(status_code=404, detail="Commande introuvable")
     return comd
 
+# CREATE : Protégé par get_current_user
 @router.post("/", response_model=CommandRead, status_code=201)
 def creer_command(data: CommandCreate, db: Session = Depends(get_db)):
+    # Crée une instance avec les données validées par Pydantic (data.model_dump)
     comd = Command(**data.model_dump())
     db.add(comd)
-    db.commit()
-    db.refresh(comd)
+    db.commit() # Sauvegarde en base
+    db.refresh(comd) # Recharge l'objet pour récupérer les ID générés par la BDD
     return comd
 
+# DELETE : Protégé par get_current_user
 @router.delete("/{id_command}", status_code=204)
 def supprimer_command(id_command: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     comd = db.get(Command, id_command)
@@ -38,12 +46,14 @@ def supprimer_command(id_command: int, db: Session = Depends(get_db), current_us
     db.delete(comd)
     db.commit()
 
+# 5. UPDATE (PUT) : Protégé par get_current_user
 @router.put("/{id_command}", response_model=CommandRead)
 def update_command(id_command: int, data: CommandCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     comd = db.get(Command, id_command)
     if comd is None:
         raise HTTPException(status_code=404, detail="Commande introuvable")
-     # Parcourir la boucle pour appliquer le ou les changements sur les champ
+    # Parcourir la boucle pour appliquer le ou les changements sur les champ
+    # 'setattr' modifie l'attribut de l'objet Python
     for champ, valeur in data.model_dump().items():
         setattr(comd, champ, valeur)
     db.commit()
