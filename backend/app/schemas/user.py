@@ -17,3 +17,4 @@ class UserCreate(BaseModel):
     username: str
     password: str
     id_role: int
+    id_restaurant: int | None = None
