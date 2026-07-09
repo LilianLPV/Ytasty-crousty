@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 # Création d'une classe qui hérite de Base
 

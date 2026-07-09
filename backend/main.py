@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from app.routers import restaurant   # ton fichier router
-from app.routers import command   # ton fichier router
-from app.routers import role   # ton fichier router
-from app.routers import permissions   # ton fichier router
-from app.routers import product   # ton fichier router
-from app.routers import user   # ton fichier router
+from app.routers import command   
+from app.routers import role   
+from app.routers import permissions   
+from app.routers import product   
+from app.routers import user   
 from app.routers import restaurant_address
 from app.routers import auth
+from app.routers import product_pictures
 
 app = FastAPI()
 app.include_router(restaurant.router)   # on branche ses routes
@@ -17,6 +18,7 @@ app.include_router(product.router)
 app.include_router(user.router)
 app.include_router(restaurant_address.router)
 app.include_router(auth.router)
+app.include_router(product_pictures.router)
 
 @app.get("/")
 def root():
