@@ -19,7 +19,7 @@ class User(Base):
     password: Mapped[str]
     # Clé étrangères il faut préciser la table et le nom de la colonne
     id_role: Mapped[int] = mapped_column(ForeignKey("roles.id_role"))
-    id_restaurant: Mapped[int] = mapped_column(ForeignKey("restaurants.id_restaurant"), nullable=True)
+    id_restaurant: Mapped[int | None] = mapped_column(ForeignKey("restaurants.id_restaurant"), nullable=True)
     # Lien direct vers l'objet lié
     role: Mapped["Role"] = relationship(back_populates="users")  
-    restaurant: Mapped["Restaurant | None"] = relationship()
+    restaurant: Mapped["Restaurant | None"] = relationship(foreign_keys=[id_restaurant])
