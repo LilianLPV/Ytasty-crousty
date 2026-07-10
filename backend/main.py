@@ -8,7 +8,8 @@ from app.routers import user
 from app.routers import restaurant_address
 from app.routers import auth
 from app.routers import product_pictures
-
+from app.routers import command_lines
+   
 app = FastAPI()
 app.include_router(restaurant.router)   # on branche ses routes
 app.include_router(command.router)
@@ -19,7 +20,7 @@ app.include_router(user.router)
 app.include_router(restaurant_address.router)
 app.include_router(auth.router)
 app.include_router(product_pictures.router)
-
+app.include_router(command_lines.router)
 @app.get("/")
 def root():
     return {"message": "Ytasty Crousty API"}
