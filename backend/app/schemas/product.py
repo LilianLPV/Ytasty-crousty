@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict
+from app.schemas.product_pictures import ProductPictureRead
 
 class ProductRead(BaseModel):
     # Grâce a sa Pydantic peut lire un objet de SQLAchemy et vérifier 
@@ -11,6 +12,9 @@ class ProductRead(BaseModel):
     availability: bool
     category: str
     ingredient_list: str
+    id_restaurant: int
+    pictures: list[ProductPictureRead] = []
+
 
 #POST 
 class ProductCreate(BaseModel):

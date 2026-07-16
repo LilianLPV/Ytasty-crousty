@@ -19,7 +19,7 @@ class Product(Base):
     availability: Mapped[bool]
     category: Mapped[str]
     ingredient_list: Mapped[str]
-    
+    id_restaurant: int
     # Clé étrangères il faut préciser la table et le nom de la colonne
     id_restaurant: Mapped[int] = mapped_column(ForeignKey("restaurants.id_restaurant"))
    
