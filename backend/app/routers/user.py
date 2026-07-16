@@ -1,54 +1,42 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.models.user import User
-from app.schemas.user import UserRead
-from app.schemas.user import UserCreate
-from app.utils.jwt import hash_password
+from app.schemas.user import UserRead, UserCreate, UserUpdate
+from app.utils.permissions import require_role
 from app.utils.jwt import get_current_user
-from app.models.user import User
 from app.database import get_db
+from app.services import user_service
 
 router = APIRouter(prefix="/users", tags=["users"])
 
+
+# Récupère la liste de tous les utilisateurs
 @router.get("/", response_model=list[UserRead])
-def liste_user(db : Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return db.scalars(select(User)).all()
+def liste_user(db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("administrateur"))):
+    return user_service.lister_users(db)
 
+# Récupère les informations d'un utilisateur via son ID
 @router.get("/{id_user}", response_model=UserRead)
-def user(id_user: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    usr = db.get(User, id_user)
-    if usr is None:
-        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
-    return usr
+def user(id_user: int, db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)):
+    return user_service.get_user(db, id_user)
 
+# Création d'un nouvel utilisateur avec hashage et vérification de l'username
 @router.post("/", response_model=UserRead, status_code=201)
-def creer_user(data: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    user_data = data.model_dump()
-    user_data["password"] = hash_password(data.password)
-    usr = User(**user_data)
-    db.add(usr)
-    db.commit()
-    db.refresh(usr)
-    return usr
+def creer_user(data: UserCreate, db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("administrateur"))):
+    return user_service.creer_user(db, data)
 
+# Suppression définitive d'un utilisateur
 @router.delete("/{id_user}", status_code=204)
-def supprimer_user(id_user: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    usr = db.get(User, id_user)
-    if usr is None:
-        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
-    db.delete(usr)
-    db.commit()
+def supprimer_user(id_user: int, db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("administrateur"))):
+    user_service.supprimer_user(db, id_user)
 
+# Met à jour les information d'un utilisateur grâce à son ID
 @router.put("/{id_user}", response_model=UserRead)
-def update_user(id_user: int, data: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    usr = db.get(User, id_user)
-    if usr is None:
-        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
-     # Parcourir la boucle pour appliquer le ou les changements sur les champ
-    for champ, valeur in data.model_dump().items():
-        setattr(usr, champ, valeur)
-    db.commit()
-    db.refresh(usr)
-    return usr
+def update_user(id_user: int, data: UserUpdate, db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("administrateur"))):
+    return user_service.update_user(db, id_user, data)

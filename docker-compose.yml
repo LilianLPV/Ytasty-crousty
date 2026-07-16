@@ -11,6 +11,25 @@ services:
         # La ou on va stocker notre bdd
     volumes:
       - postgres_data:/var/lib/postgresql/data
-volumes:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d ytasty_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  backend:
+    build: ./backend
+    container_name: ytasty-backend
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql+psycopg://admin:${POSTGRES_PASSWORD}@db:5432/ytasty_db
+    ports:
+      - '8000:8000'
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
 # Docker créer et gérer cette espace de stockage
+volumes:
   postgres_data:
