@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict
+from app.schemas.restaurant_address import RestaurantAddressRead
 
 #GET
 class RestaurantRead(BaseModel):
@@ -10,6 +11,8 @@ class RestaurantRead(BaseModel):
     opening_status: bool
     opening_hours: str
     contact_details: str
+    restaurant_address: RestaurantAddressRead
+
 
 #POST
 class RestaurantCreate(BaseModel):

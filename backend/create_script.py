@@ -121,8 +121,8 @@ with Session(engine) as session:
         {"name": "Double Crousty", "description": "Double poulet pané, double cheddar",
          "price": 11.50, "category": "burgers",
          "ingredient_list": "pain, 2 poulets pané, 2 cheddar, oignons, sauce crousty"},
-        {"name": "Chicken Crousty", "description": "Triple poulet pané croustillant",
-         "price": 9.00, "category": "burgers",
+        {"name": "Triple Crousty", "description": "Triple poulet pané croustillant",
+         "price": 13.00, "category": "burgers",
          "ingredient_list": "pain, poulet pané, salade, mayonnaise"},
         {"name": "Veggie Crousty", "description": "Burger végétarien galette de légumes",
          "price": 8.00, "category": "burgers",
@@ -195,14 +195,31 @@ with Session(engine) as session:
                 session.flush()
             produits[(item["name"], ville)] = prod
     print(f"Produits OK ({len(carte)} x {len(restaurants)} restaurants)")
-    for nom_prod, fichier in [("Crousty Burger", "crousty_burger.jpg"),
-                              ("Frites Maison", "frites.jpg")]:
-        prod = produits[nom_prod, "Aix-en-Provence"]
-        existe = session.scalars(
-            select(Product_picture).where(Product_picture.id_product == prod.id_product)
-        ).first()
-        if existe is None:
-            session.add(Product_picture(picture=fichier, id_product=prod.id_product))
+    for nom_prod, fichier in [("Crousty Burger", "crousty_burger.png"),
+                              ("Double Crousty", "double_crousty.png"),
+                              ("Triple Crousty", "triple_crousty.png"),
+                              ("Veggie Crousty", "veggie_crousty.jpg"),
+                              ("Frites Maison", "frite.png"),
+                              ("Potatoes", "potatoes.png"),
+                              ("Onion Rings", "onion_ring.jpg"),
+                              ("Nuggets x6", "nugget.png"),
+                              ("Coca-Cola", "coca_cola.png"),
+                              ("Eau minérale", "eau.png"),
+                              ("Jus d'orange", "jus_orange.png"),
+                              ("Sundae Chocolat", "sundae_chocolate.png"),
+                              ("Cookie", "cookie.png"),
+                              ("Muffin Myrtille", "muffin_myrtille.png"),
+                              ("Menu Crousty", "menu_crousty.png"),
+                              ("Menu Enfant", "menu_enfant.png")]:
+        for ville in restaurants:
+            prod = produits[nom_prod, ville]
+            existe = session.scalars(
+                select(Product_picture).where(Product_picture.id_product == prod.id_product)
+            ).first()
+            if existe is None:
+                session.add(Product_picture(picture=fichier, id_product=prod.id_product))
+            else:
+                existe.picture = fichier
     print("Images OK")
     # COMMANDES
     cmd = session.scalars(
