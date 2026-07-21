@@ -11,9 +11,8 @@ export function Panier() {
   const [panier, setPanier] = useState<Product[]>(() => {
     const sauvegarde = localStorage.getItem("mon_panier_react");
     return sauvegarde ? JSON.parse(sauvegarde) : [];
-    });
+  });
   const idResto = Number(localStorage.getItem("id_resto"));
-
 
   const lines = panier.reduce(
     (acc, plat) => {
@@ -27,6 +26,30 @@ export function Panier() {
     },
     [] as { id_product: number; quantity: number }[],
   );
+  const panierGroupe = panier.reduce(
+    (acc, plat) => {
+      const dejaLa = acc.find(
+        (ligne) => ligne.plat.id_product === plat.id_product,
+      );
+      if (dejaLa) {
+        dejaLa.quantity += 1;
+      } else {
+        acc.push({ plat: plat, quantity: 1 });
+      }
+      return acc;
+    },
+    [] as { plat: Product; quantity: number }[],
+  );
+  const ajouterUnExemplaire = (plat: Product) => {
+    setPanier((prev) => [...prev, plat]);
+  };
+  const retirerUnExemplaire = (id_product: number) => {
+    setPanier((prev) => {
+      const index = prev.findIndex((plat) => plat.id_product === id_product);
+      if (index === -1) return prev;
+      return prev.filter((_, i) => i !== index);
+    });
+  };
   const envoyerCommande = async () => {
     const commande = {
       withdrawal_method: modeRetrait,
@@ -50,10 +73,6 @@ export function Panier() {
     localStorage.setItem("mon_panier_react", JSON.stringify(panier));
   }, [panier]);
 
-  const retirerDuPanier = (index: number) => {
-    setPanier((ancien) => ancien.filter((_, i) => i !== index));
-  };
-
   const total = panier.reduce((somme, plat) => somme + plat.price, 0);
 
   return (
@@ -68,6 +87,8 @@ export function Panier() {
             Numéro de commande : <strong>{numeroCommande}</strong>
           </p>
           <Link to="/">Retour à l'accueil</Link>
+          <br />
+          <Link to="/suivre-commande">Suivre ma commande</Link>
         </div>
       ) : panier.length === 0 ? (
         <div>
@@ -77,18 +98,26 @@ export function Panier() {
       ) : (
         <>
           <ul className="liste-panier">
-            {panier.map((plat, index) => (
-              <li key={index} className="panier-item">
+            {panierGroupe.map((ligne) => (
+              <li key={ligne.plat.id_product} className="panier-item">
                 <div className="panier-item-info">
-                  <strong>{plat.name}</strong>
-                  <span>— {plat.price.toFixed(2)} €</span>
+                  <strong>{ligne.plat.name}</strong>
+                  <span>
+                    — {ligne.plat.price.toFixed(2)} € × {ligne.quantity} ={" "}
+                    {(ligne.plat.price * ligne.quantity).toFixed(2)} €
+                  </span>
                 </div>
-                <button
-                  onClick={() => retirerDuPanier(index)}
-                  className="bouton-supprimer"
-                >
-                  Retirer
-                </button>
+                <div className="panier-item-actions">
+                  <button
+                    onClick={() => retirerUnExemplaire(ligne.plat.id_product)}
+                  >
+                    –
+                  </button>
+                  <span>{ligne.quantity}</span>
+                  <button onClick={() => ajouterUnExemplaire(ligne.plat)}>
+                    +
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
