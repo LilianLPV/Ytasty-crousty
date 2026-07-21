@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { listerRestaurants } from "./api";
+import "./ChoixRestaurant.css";
 import { Link } from "react-router";
 import type { Restaurant } from "../../../types/restaurant";
 
@@ -23,7 +24,7 @@ export function ChoixRestaurant() {
     <div>
     <title>Ytasty Crousty</title>
       <h1>Où voulez-vous commander ?</h1>
-      <ul>
+      <ul className="liste-restaurants">
         {restaurants.map((r) => (
           <li key={r.id_restaurant}>
               <Link to={`/restaurants/${r.id_restaurant}/menu`}>

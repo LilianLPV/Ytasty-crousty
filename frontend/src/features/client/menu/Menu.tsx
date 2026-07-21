@@ -1,4 +1,4 @@
-import "./menu.css";
+import "./Menu.css";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { recupererRestaurant, listerMenu } from "./api";
@@ -14,13 +14,16 @@ export function Menu() {
   const [produits, setProduits] = useState<Product[]>([]);
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState<string | null>(null);
-  const [panier, setPanier] = useState<Product[]>(() =>
-    JSON.parse(localStorage.getItem("panier") ?? "[]"),
-  );
+  const [panier, setPanier] = useState<Product[]>(() => {
+    const sauvegarde = localStorage.getItem("mon_panier_react");
+    return sauvegarde ? JSON.parse(sauvegarde) : [];
+  });
   useEffect(() => {
-    localStorage.setItem("panier", JSON.stringify(panier));
+    localStorage.setItem("mon_panier_react", JSON.stringify(panier));
   }, [panier]);
-
+  useEffect(() => {
+    localStorage.setItem("id_resto", String(id));
+  }, [id]);
   useEffect(() => {
     setChargement(true);
     Promise.all([recupererRestaurant(id), listerMenu(id)])
@@ -45,11 +48,9 @@ export function Menu() {
 
   const ajouterAuPanier = (plat: Product) => {
     setPanier((prevPanier) => [...prevPanier, plat]);
-    console.log("ajout panier", panier);
   };
-  const retirerDuPanier = (index: Number) => {
+  const retirerDuPanier = (index: number) => {
     setPanier((prevPanier) => prevPanier.filter((_, i) => i !== index));
-    console.log("panier après suppression", panier);
   };
   return (
     <div>
@@ -61,11 +62,7 @@ export function Menu() {
         {restaurant.restaurant_address.address}
       </p>
       <section className="panier">
-        <Link
-          to="/panier"
-          state={{ panierSauvegarde: panier, idResto: id }}
-          className="bouton-panier"
-        >
+        <Link to="/panier" className="bouton-panier">
           Valider mon panier ({panier.length} articles)
         </Link>
         {produits.length === 0 && <p>Aucun plat disponible pour le moment.</p>}
