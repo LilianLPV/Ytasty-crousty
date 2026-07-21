@@ -1,4 +1,8 @@
-const BASE_URL = '/api'
+import axios from 'axios'
+
+export const apiClient = axios.create({
+  baseURL: '/api',
+})
 
 export class ApiError extends Error {
   status: number
@@ -10,16 +14,11 @@ export class ApiError extends Error {
   }
 }
 
-export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-  })
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => null)
-    throw new ApiError(res.status, body?.detail ?? res.statusText)
-  }
-
-  return res.status === 204 ? (undefined as T) : res.json()
-}
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response?.status ?? 0
+    const message = error.response?.data?.detail ?? error.message
+    return Promise.reject(new ApiError(status, message))
+  },
+)

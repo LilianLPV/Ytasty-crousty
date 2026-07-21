@@ -1,4 +1,7 @@
-import { api } from '../../../lib/api'
-import type { Restaurant } from '../../../types/restaurant'
+import { apiClient } from "../../../lib/api";
+import type { Restaurant } from "../../../types/restaurant";
 
-export const listerRestaurants = () => api<Restaurant[]>('/restaurants/')
+export const listerRestaurants = () =>
+  apiClient
+    .get<Restaurant[]>("/restaurants/")
+    .then((response) => response.data);

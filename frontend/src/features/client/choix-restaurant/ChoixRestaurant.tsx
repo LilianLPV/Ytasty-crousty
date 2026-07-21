@@ -21,6 +21,7 @@ export function ChoixRestaurant() {
 
   return (
     <div>
+    <title>Ytasty Crousty</title>
       <h1>Où voulez-vous commander ?</h1>
       <ul>
         {restaurants.map((r) => (
