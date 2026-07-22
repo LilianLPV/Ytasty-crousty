@@ -5,6 +5,9 @@ import { ChoixRestaurant } from "./features/client/choix-restaurant/ChoixRestaur
 import { Menu } from "./features/client/menu/Menu.tsx";
 import { Panier } from "./features/client/panier/Panier.tsx";
 import { SuivreCommande } from "./features/client/command/SuivreCommande.tsx";
+import { ConnexionUtilisateur } from "./features/auth/Login.tsx";
+import { Commandes } from "./features/staff/Commands.tsx";
+import { RouteProtegee } from "./features/auth/RouteProtege.tsx";
 const root = document.getElementById("root")!;
 
 ReactDOM.createRoot(root).render(
@@ -14,6 +17,16 @@ ReactDOM.createRoot(root).render(
       <Route path="/restaurants/:id_restaurant/menu" element={<Menu />} />
       <Route path="/panier" element={<Panier />} />
       <Route path="/suivre-commande" element={<SuivreCommande />} />
+      <Route path="/login" element={<ConnexionUtilisateur />} />
+      <Route
+        path="/staff/commandes"
+        element={
+          <RouteProtegee>
+            {" "}
+            <Commandes />{" "}
+          </RouteProtegee>
+        }
+      />
     </Routes>
   </BrowserRouter>,
 );

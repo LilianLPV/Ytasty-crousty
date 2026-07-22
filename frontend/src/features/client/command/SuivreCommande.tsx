@@ -2,6 +2,7 @@ import "./SuivreCommande.css";
 import { useState } from "react";
 import { suivreCommande } from "./api";
 import type { Command } from "../../../types/commands";
+import { Link } from "react-router";
 
 export function SuivreCommande() {
   const [numeroCommande, setNumeroCommande] = useState("");
@@ -25,6 +26,7 @@ export function SuivreCommande() {
 
   return (
     <div className="page-suivi">
+      <title>Ytasty Crousty</title>
       <h1>Suivre ma commande</h1>
       <input
         type="text"
@@ -48,6 +50,10 @@ export function SuivreCommande() {
           <p>Total : {commande.price_total.toFixed(2)} €</p>
         </div>
       )}
+      <br />
+      <Link to="/" className="bouton">
+        Retourner au menu
+      </Link>
     </div>
   );
 }
