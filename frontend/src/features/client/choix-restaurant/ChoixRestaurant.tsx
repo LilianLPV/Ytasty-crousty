@@ -19,21 +19,22 @@ export function ChoixRestaurant() {
   if (chargement) return <p>Chargement…</p>;
   if (erreur) return <p>Erreur : {erreur}</p>;
 
-
   return (
     <div>
-    <title>Ytasty Crousty</title>
+      <title>Ytasty Crousty</title>
       <h1>Où voulez-vous commander ?</h1>
       <ul className="liste-restaurants">
         {restaurants.map((r) => (
           <li key={r.id_restaurant}>
-              <Link to={`/restaurants/${r.id_restaurant}/menu`}>
+            <Link to={`/restaurants/${r.id_restaurant}/menu`}>
               {r.restaurant_address.city}{" "}
-           
-           </Link> 
+            </Link>
           </li>
         ))}
       </ul>
+      <Link to="/login">Se connecter</Link>
+      <br />
+      <Link to="/suivre-commande">Suivre ma commande</Link>
     </div>
   );
 }
