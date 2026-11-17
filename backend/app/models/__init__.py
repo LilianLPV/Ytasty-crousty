@@ -9,4 +9,5 @@ from app.models.permissions import Permission
 from app.models.product_pictures import Product_picture
 from app.models.role import Role
 
-Base.metadata.create_all(engine)
+# Le schéma est géré par les migrations Alembic (dossier migrations/) :
+# plus de create_all au démarrage.

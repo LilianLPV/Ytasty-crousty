@@ -1,0 +1,48 @@
+name: API
+
+on:
+  push:
+    branches: [main]
+    paths: ["backend/**", ".github/workflows/api.yml"]
+  pull_request:
+    paths: ["backend/**", ".github/workflows/api.yml"]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: admin
+          POSTGRES_DB: ytasty_db
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U admin -d ytasty_db"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql+psycopg://admin:admin@localhost:5432/ytasty_db
+      SECRET_KEY: secret-de-test-ci
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: Admin1234!
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version-file: backend/.python-version
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+      - run: pip install -r requirements-dev.txt
+      - name: Migrations
+        run: alembic upgrade head
+      - name: Données initiales
+        run: python create_script.py
+      - name: Tests
+        run: pytest -q

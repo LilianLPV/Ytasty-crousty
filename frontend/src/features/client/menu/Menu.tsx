@@ -1,4 +1,4 @@
-import "./Menu.css";
+import "./menu.css";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { recupererRestaurant, listerMenu } from "./api";

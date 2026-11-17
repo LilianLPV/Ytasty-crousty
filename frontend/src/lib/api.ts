@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+// En production, VITE_API_URL contient l'URL publique de l'API (fixée au build).
+// En local, elle est vide : on passe par le proxy Vite défini sur /api.
 export const apiClient = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
 })
 
 export class ApiError extends Error {
