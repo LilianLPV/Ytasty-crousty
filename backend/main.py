@@ -1,4 +1,10 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from fastapi.responses import JSONResponse
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from app.config import get_cors_origins
+from app.database import get_db
 from app.routers import restaurant   # ton fichier router
 from app.routers import command   
 from app.routers import role   
@@ -18,7 +24,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  
+    allow_origins=get_cors_origins(),  # variable CORS_ORIGINS
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,3 +44,12 @@ app.include_router(command_lines.router)
 def root():
     return {"message": "Ytasty Crousty API"}
 
+
+@app.get("/health", tags=["monitoring"])
+def health(db: Session = Depends(get_db)):
+    """Vérifie que l'API répond et que la base est joignable."""
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception:
+        return JSONResponse(status_code=503, content={"status": "error", "database": "unreachable"})
+    return {"status": "ok", "database": "ok"}

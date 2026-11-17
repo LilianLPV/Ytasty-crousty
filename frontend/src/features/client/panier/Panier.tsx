@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import type { Product } from "../../../types/products";
 import { passerCommande } from "../command/api";
-import "./Panier.css";
+import "./panier.css";
 
 export function Panier() {
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
